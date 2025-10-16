@@ -22,22 +22,10 @@ export default defineNuxtConfig({
     },
     authSecret: process.env.AUTH_SECRET,
     origin: process.env.ORIGIN,
-    authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
     authProvider: {
       type: 'authjs'
-    }
-
-  },
-  auth: {
-    baseURL: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
-    provider: {
-      type: 'authjs'
     },
-    globalAppMiddleware: {
-      isEnabled: true,
-      allow404WithoutAuth: true
-    },
-    providers: {
+    authProviders: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
@@ -50,9 +38,9 @@ export default defineNuxtConfig({
         }
       }
     },
-    session: {
+    authSession: {
       enableRefreshOnWindowFocus: false,
       enableRefreshTokenRefresh: true
     }
-  }
+  },
 })
