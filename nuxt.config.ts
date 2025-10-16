@@ -15,10 +15,17 @@ export default defineNuxtConfig({
     public: {
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here',
       authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+      authGlobalAppMiddleware: {
+        isEnabled: true,
+        allow404WithoutAuth: true
+      }
     },
     authSecret: process.env.AUTH_SECRET,
     origin: process.env.ORIGIN,
     authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+    authProvider: {
+      type: 'authjs'
+    }
 
   },
   auth: {
