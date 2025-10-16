@@ -1,14 +1,14 @@
 import { NuxtAuthHandler } from '#auth'
 
 export default NuxtAuthHandler({
-  secret: useRuntimeConfig().auth.secret,
+  secret: process.env.AUTH_SECRET,
   providers: [
     {
       id: 'google',
       name: 'google',
       type: 'oauth',
-      clientId: useRuntimeConfig().auth.google.clientId,
-      clientSecret: useRuntimeConfig().auth.google.clientSecret,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         url: 'https://accounts.google.com/o/oauth2/v2/auth',
         params: {

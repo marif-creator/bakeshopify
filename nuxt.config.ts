@@ -13,16 +13,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here'
-    },
-    auth: {
-      secret: process.env.AUTH_SECRET || 'your-secret-key',
-      baseUrl: process.env.AUTH_BASE_URL || 'http://localhost:3000',
-      origin: process.env.AUTH_ORIGIN || 'http://localhost:3000',
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id',
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret',
-        callbackUrl: process.env.CALLBACKS_URL || 'http://localhost:3000'
-      }
     }
   },
   auth: {
