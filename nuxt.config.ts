@@ -14,17 +14,36 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here',
+      authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
     },
     authSecret: process.env.AUTH_SECRET,
     origin: process.env.ORIGIN,
   },
-  auth:{
-    baseURL: (process.env.ORIGIN || 'http://localhost:3000') + '/api/auth',
+  auth: {
+    baseURL: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+    provider: {
+      type: 'authjs'
+    },
+    globalAppMiddleware: {
+      isEnabled: true,
+      allow404WithoutAuth: true
+    },
     providers: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here'
-      },
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
+        authorization: {
+          params: {
+            prompt: 'consent',
+            access_type: 'offline',
+            response_type: 'code'
+          }
+        }
+      }
     },
+    session: {
+      enableRefreshOnWindowFocus: false,
+      enableRefreshTokenRefresh: true
+    }
   }
 })
