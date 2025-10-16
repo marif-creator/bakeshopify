@@ -18,6 +18,8 @@ export default defineNuxtConfig({
     },
     authSecret: process.env.AUTH_SECRET,
     origin: process.env.ORIGIN,
+    authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+
   },
   auth: {
     baseURL: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
