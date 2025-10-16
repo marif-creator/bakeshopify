@@ -1,4 +1,4 @@
-import Auth from '@auth/core'
+import { Auth } from '@auth/core'
 import Google from '@auth/core/providers/google'
 
 export default defineEventHandler(async (event) => {
