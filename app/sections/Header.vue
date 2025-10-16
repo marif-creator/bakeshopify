@@ -28,7 +28,7 @@
         <!-- Auth Section -->
         <div v-if="status === 'authenticated' && data?.user">
           <!-- User Menu -->
-          <UModal>
+          <UPopover>
             <button class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
               <img
                 :src="data.user.image || '/default-avatar.png'"
@@ -79,21 +79,18 @@
                 </div>
               </div>
             </template>
-          </UModal>
+          </UPopover>
         </div>
 
         <!-- Login Button (when not authenticated) -->
-        <UModal v-else class="max-w-[100px]">
+        <UPopover v-else class="max-w-[100px]">
           <button class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
             <Icon name="mdi:account" size="20" class="text-gray-600" />
             <span class="text-gray-700 font-medium">Login</span>
           </button>
 
           <template #content>
-            <div class="p-8 text-center">
-              <h2 class="text-xl font-semibold text-gray-900 mb-6">
-                Get easily track orders and checkout faster
-              </h2>
+            <div class="p-8 max-w-[300px] text-center">
 
               <div class="space-y-3">
                 <UButton
@@ -117,7 +114,17 @@
               </div>
             </div>
           </template>
-        </UModal>
+        </UPopover>
+
+        <template>
+  <UPopover>
+    <UButton label="Open" color="neutral" variant="subtle" />
+
+    <template #content>
+      <Placeholder class="size-48 m-4 inline-flex" />
+    </template>
+  </UPopover>
+</template>
 
 
         <!-- Cart -->
