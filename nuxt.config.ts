@@ -24,5 +24,17 @@ export default defineNuxtConfig({
         callbackUrl: process.env.CALLBACKS_URL || 'http://localhost:3000'
       }
     }
+  },
+  auth: {
+    provider: {
+      type: 'local'
+    },
+    sessionRefresh: {
+      enablePeriodically: false,
+      enableOnWindowFocus: false
+    },
+    globalAppMiddleware: {
+      isEnabled: false
+    }
   }
 })
