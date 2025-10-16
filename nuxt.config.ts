@@ -15,14 +15,9 @@ export default defineNuxtConfig({
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here'
     }
   },
-  auth: {
-    provider: {
-      type: 'authjs'
-    },
-    defaultProvider: 'google',
-    enableGlobalAppMiddleware: false,
-    enableSessionRefresh: false,
-    origin: process.env.AUTH_ORIGIN || 'http://localhost:3000',
-    baseUrl: process.env.AUTH_BASE_URL || 'http://localhost:3000'
+   auth: {
+    origin: 'bakeshopify.vercel.app', // or your deployed URL
+    enableGlobalAppMiddleware: true,
+    defaultProvider: 'authjs'
   }
 })
