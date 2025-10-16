@@ -27,15 +27,7 @@ export default defineNuxtConfig({
   },
   auth: {
     defaultProvider: 'google',
-    provider: {
-      type: 'local'
-    },
-    sessionRefresh: {
-      enablePeriodically: false,
-      enableOnWindowFocus: false
-    },
-    globalAppMiddleware: {
-      isEnabled: false
-    }
+    enableGlobalAppMiddleware: true,
+    origin:"https://bakeshopify.vercel.app"
   }
 })
