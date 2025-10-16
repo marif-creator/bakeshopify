@@ -18,22 +18,12 @@ export default defineNuxtConfig({
     authUrl : '/api/auth'
   },
   auth:{
-    baseURL: process.env.ORIGIN || 'http://localhost:3000',
+    baseURL: process.env.ORIGIN || 'http://localhost:3000' + '/api/auth',
     providers: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here'
       },
     },
-    provider: {
-      type: 'authjs',
-      endpoints: {
-        signIn: { path: '/login', method: 'post' },
-        signOut: { path: '/logout', method: 'post' },
-        signUp: { path: '/register', method: 'post' },
-        getSession: { path: '/session', method: 'get' },
-      }
-    }
-
   }
 })
