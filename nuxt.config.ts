@@ -15,6 +15,8 @@ export default defineNuxtConfig({
     public: {
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here',
     },
+    authSecret: process.env.AUTH_SECRET,
+    origin: process.env.ORIGIN,
   },
   auth:{
     baseURL: (process.env.ORIGIN || 'http://localhost:3000') + '/api/auth',

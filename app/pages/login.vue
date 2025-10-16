@@ -112,8 +112,15 @@ const continueAsGuest = () => {
 
 // Watch for authentication status changes
 watchEffect(() => {
-  if (status.value === 'authenticated' && session.value) {
+  if (status.value === 'authenticated' && session.value?.user) {
     // User is authenticated, redirect to home page
+    router.push('/')
+  }
+})
+
+// Also check on mounted for immediate redirect if already authenticated
+onMounted(() => {
+  if (status.value === 'authenticated' && session.value?.user) {
     router.push('/')
   }
 })
