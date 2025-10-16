@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     authUrl : '/api/auth'
   },
   auth:{
-    baseURL: process.env.ORIGIN || 'http://localhost:3000' + '/api/auth',
+    baseURL: (process.env.ORIGIN || 'http://localhost:3000') + '/api/auth',
     providers: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
