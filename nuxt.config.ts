@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     },
     auth: {
       secret: process.env.AUTH_SECRET || 'your-secret-key',
+      baseUrl: process.env.AUTH_BASE_URL || 'http://localhost:3000',
       origin: process.env.AUTH_ORIGIN || 'http://localhost:3000',
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id',
