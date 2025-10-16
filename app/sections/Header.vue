@@ -265,6 +265,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useAuth } from '#auth'
 import { ref, onMounted, onUnmounted } from 'vue';
 import ButtonLink from '~/components/ButtonLink.vue';
 import IconLink from '~/components/IconLink.vue';

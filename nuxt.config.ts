@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/image', '@nuxt/ui', '@sidebase/nuxt-auth'],
+  modules: ['@nuxt/image', '@nuxt/ui'],
   vite: {
     plugins: [
       tailwindcss()
@@ -15,9 +15,4 @@ export default defineNuxtConfig({
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here'
     }
   },
-   auth: {
-    origin: 'https://bakeshopify.vercel.app', // or your deployed URL
-    enableGlobalAppMiddleware: true,
-    defaultProvider: 'authjs'
-  }
 })
