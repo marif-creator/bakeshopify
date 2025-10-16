@@ -18,7 +18,6 @@ export default defineNuxtConfig({
     authUrl : '/api/auth'
   },
   auth:{
-    originEnvKey: 'NUXT_AUTH_URL',
     origin: process.env.ORIGIN || 'http://localhost:3000',
     providers: {
       google: {
