@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     }
   },
    auth: {
-    origin: 'bakeshopify.vercel.app', // or your deployed URL
+    origin: 'https://bakeshopify.vercel.app', // or your deployed URL
     enableGlobalAppMiddleware: true,
     defaultProvider: 'authjs'
   }
