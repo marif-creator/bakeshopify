@@ -16,8 +16,13 @@ export default defineNuxtConfig({
     }
   },
   auth: {
+    provider: {
+      type: 'authjs'
+    },
     defaultProvider: 'google',
-    enableGlobalAppMiddleware: true,
-    origin:"https://bakeshopify.vercel.app"
+    enableGlobalAppMiddleware: false,
+    enableSessionRefresh: false,
+    origin: process.env.AUTH_ORIGIN || 'http://localhost:3000',
+    baseUrl: process.env.AUTH_BASE_URL || 'http://localhost:3000'
   }
 })
