@@ -26,6 +26,7 @@ export default defineNuxtConfig({
     }
   },
   auth: {
+    defaultProvider: 'google',
     provider: {
       type: 'local'
     },
