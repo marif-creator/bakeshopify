@@ -21,15 +21,20 @@ export default defineNuxtConfig({
 
     },
   },
-  auth: {
-    baseURL: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
-    provider: {
-      type: 'authjs'
+   auth: {
+    isEnabled: true,
+    disableServerSideAuth: false,
+    originEnvKey: 'AUTH_ORIGIN',
+    baseURL: process.env.ORIGIN? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+     provider: {
+      type: 'authjs',
+      trustHost: false,
+      defaultProvider: 'google',
+      addDefaultCallbackUrl: true
     },
-    globalAppMiddleware: {
-      isEnabled: true
-    },
-    enableGlobalAppMiddleware: true,
-    defaultProvider: 'google',
+    sessionRefresh: {
+      enablePeriodically: true,
+      enableOnWindowFocus: true,
+    }
   }
 })
