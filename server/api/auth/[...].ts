@@ -9,10 +9,6 @@ export default NuxtAuthHandler({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }) as any
   ],
-  pages: {
-    signIn: '/login',
-    error: '/auth/error',
-  },
    callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       console.log('signIn', { user, account, profile, email, credentials })
