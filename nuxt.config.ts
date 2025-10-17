@@ -11,21 +11,28 @@ export default defineNuxtConfig({
     ],
   },
   css: ['~/assets/css/main.css'],
+  sourcemap: {
+    server: true,
+    client: true
+  },
   runtimeConfig: {
     public: {
       pexelsApiKey: process.env.PEXELS_API_KEY || 'your-pexels-api-key-here',
-      authBaseUrl: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
       authGlobalAppMiddleware: {
         isEnabled: true,
         allow404WithoutAuth: true
-      }
+      },
+
     },
     authSecret: process.env.AUTH_SECRET,
-    origin: process.env.ORIGIN,
-    authProvider: {
-      type: 'authjs'
-    },
-    authProviders: {
+    authSession: {
+      enableRefreshOnWindowFocus: false,
+      enableRefreshTokenRefresh: true
+    }
+  },
+  auth : {
+    baseURL : process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+    providers :{
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
@@ -38,9 +45,8 @@ export default defineNuxtConfig({
         }
       }
     },
-    authSession: {
-      enableRefreshOnWindowFocus: false,
-      enableRefreshTokenRefresh: true
+    provider : {
+      type: 'authjs'
     }
-  },
+  }
 })
