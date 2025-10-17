@@ -96,10 +96,12 @@ const router = useRouter()
 const signInWithGoogle = async () => {
   try {
     loading.value = true
+    console.log('Initiating Google sign in...')
     await signIn('google', {
       callbackUrl: '/',
       redirect: false
     })
+    console.log('Google sign in successful')
   } catch (error) {
     console.error('Google sign in error:', error)
     // Error handling is managed by Nuxt Auth
