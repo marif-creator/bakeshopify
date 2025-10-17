@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   auth: {
     globalAppMiddleware: true,
     isEnabled: true,
-    disableServerSideAuth: false,
+    disableServerSideAuth: true,
     originEnvKey: 'AUTH_ORIGIN',
     baseURL: process.env.ORIGIN? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
     provider: {
