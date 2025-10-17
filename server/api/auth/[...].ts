@@ -1,15 +1,15 @@
-import { NuxtAuthHandler } from '#auth'
-import Google from '@auth/core/providers/google';
-export default NuxtAuthHandler({
+import NextAuth from 'next-auth'
+import Google from 'next-auth/providers/google'
+
+export default NextAuth({
   secret: process.env.AUTH_SECRET || 'your-secret-key',
   providers: [
-    // @ts-ignore
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     })
   ],
-   callbacks: {
+  callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       console.log('signIn', { user, account, profile, email, credentials })
       return true

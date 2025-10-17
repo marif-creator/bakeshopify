@@ -88,23 +88,21 @@
 definePageMeta({
   auth: false
 })
-const { signIn, data: session, status } = useAuth()
+
+// NextAuth.js client setup
 const loading = ref(false)
 const router = useRouter()
 
-// Handle Google sign in
+// Handle Google sign in using NextAuth.js client
 const signInWithGoogle = async () => {
   try {
     loading.value = true
     console.log('Initiating Google sign in...')
-    await signIn('google', {
-      callbackUrl: '/',
-      redirect: false
-    })
-    console.log('Google sign in successful')
+
+    // Use window.location to redirect to NextAuth.js signin endpoint
+    window.location.href = '/api/auth/signin/google?callbackUrl=/'
   } catch (error) {
     console.error('Google sign in error:', error)
-    // Error handling is managed by Nuxt Auth
   } finally {
     loading.value = false
   }
@@ -115,18 +113,22 @@ const continueAsGuest = () => {
   router.push('/')
 }
 
-// Watch for authentication status changes
-watchEffect(() => {
-  if (status.value === 'authenticated' && session.value?.user) {
-    // User is authenticated, redirect to home page
-    router.push('/')
+// Check authentication status
+const checkAuthStatus = async () => {
+  try {
+    const response = await $fetch('/api/auth/session')
+    if (response?.user) {
+      // User is authenticated, redirect to home page
+      router.push('/')
+    }
+  } catch (error) {
+    // Not authenticated, stay on login page
+    console.log('Not authenticated')
   }
-})
+}
 
-// Also check on mounted for immediate redirect if already authenticated
+// Check authentication status on mount
 onMounted(() => {
-  if (status.value === 'authenticated' && session.value?.user) {
-    router.push('/')
-  }
+  checkAuthStatus()
 })
 </script>
