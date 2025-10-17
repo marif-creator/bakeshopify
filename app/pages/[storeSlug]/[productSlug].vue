@@ -23,6 +23,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  auth: false
+})
 // Import components
 import ProductPreview from '~/components/ProductPreview.vue'
 import AddToChart from '~/components/ProductPage/AddToChart.vue'

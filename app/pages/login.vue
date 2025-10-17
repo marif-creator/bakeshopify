@@ -85,6 +85,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  auth: false
+})
 const { signIn, data: session, status } = useAuth()
 const loading = ref(false)
 const router = useRouter()

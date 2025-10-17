@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  auth: false
+})
 import Carousel from '~/components/Carousel.vue';
 import Content from '~/sections/Content.vue';
 import FindUs from '~/sections/FindUs.vue';

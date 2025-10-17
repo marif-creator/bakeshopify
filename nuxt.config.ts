@@ -30,13 +30,15 @@ export default defineNuxtConfig({
       enableRefreshTokenRefresh: true
     }
   },
-  auth : {
-    baseURL : process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
+  auth: {
+    baseURL: process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
     provider: {
       type: 'authjs'
     },
     globalAppMiddleware: {
       isEnabled: true
     },
+    enableGlobalAppMiddleware: true,
+    defaultProvider: 'google',
   }
 })
