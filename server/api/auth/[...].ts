@@ -1,10 +1,10 @@
 import { NuxtAuthHandler } from '#auth'
-import GoogleProvider from 'next-auth/providers/google';
-
+import Google from '@auth/core/providers/google';
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET || 'your-secret-key',
   providers: [
-    GoogleProvider({
+    // @ts-ignore
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     })
