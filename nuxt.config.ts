@@ -4,7 +4,7 @@ import { baseURL } from "process";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@sidebase/nuxt-auth','@nuxt/image', '@nuxt/ui'],
+  modules: ['@sidebase/nuxt-auth', '@nuxt/image', '@nuxt/ui'],
   vite: {
     plugins: [
       tailwindcss()
@@ -21,12 +21,13 @@ export default defineNuxtConfig({
 
     },
   },
-   auth: {
+  auth: {
+    globalAppMiddleware: true,
     isEnabled: true,
     disableServerSideAuth: false,
     originEnvKey: 'AUTH_ORIGIN',
     baseURL: process.env.ORIGIN? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
-     provider: {
+    provider: {
       type: 'authjs',
       trustHost: false,
       defaultProvider: 'google',
