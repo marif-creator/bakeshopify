@@ -32,21 +32,11 @@ export default defineNuxtConfig({
   },
   auth : {
     baseURL : process.env.ORIGIN ? `${process.env.ORIGIN}/api/auth` : 'http://localhost:3000/api/auth',
-    providers :{
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
-        authorization: {
-          params: {
-            prompt: 'consent',
-            access_type: 'offline',
-            response_type: 'code'
-          }
-        }
-      }
-    },
-    provider : {
+    provider: {
       type: 'authjs'
-    }
+    },
+    globalAppMiddleware: {
+      isEnabled: true
+    },
   }
 })
