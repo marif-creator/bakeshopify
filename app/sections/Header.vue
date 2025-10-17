@@ -271,7 +271,10 @@ import IconLink from '~/components/IconLink.vue';
 import SelectGhost from '~/components/SelectGhost.vue';
 import SearchBar from '~/components/SearchBar.vue';
 
-const { data, status, signOut } = useAuth()
+// NextAuth.js session state
+const data = ref<any>(null)
+const status = ref<string>('unauthenticated')
+const loading = ref(true)
 
 const selectedLanguage = ref('EN');
 const selectedCurrency = ref('USD');
@@ -293,7 +296,7 @@ const handleScroll = () => {
   isLinkVisible.value = scrollTop > hideThreshold;
 };
 
-onMounted(() => {
+onMounted(async () => {
   // Get reference to the link element
   linkElement.value = document.getElementById('link');
 
@@ -305,6 +308,8 @@ onMounted(() => {
 
   // Also listen to window scroll as fallback
   window.addEventListener('scroll', handleScroll);
+
+  // Check authentication status
 });
 
 onUnmounted(() => {
@@ -316,9 +321,20 @@ onUnmounted(() => {
 });
 
 const handleSignOut = async () => {
-  await signOut({
-    callbackUrl: '/login'
-  })
+  try {
+    await $fetch('/api/auth/signout', {
+      method: 'POST',
+      body: {
+        callbackUrl: '/login'
+      }
+    })
+    // Redirect to login page after sign out
+    await navigateTo('/login')
+  } catch (error) {
+    console.error('Sign out error:', error)
+    // Force redirect to login even if sign out fails
+    await navigateTo('/login')
+  }
 }
 
 </script>

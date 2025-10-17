@@ -99,8 +99,7 @@ const signInWithGoogle = async () => {
     loading.value = true
     console.log('Initiating Google sign in...')
 
-    // Use window.location to redirect to NextAuth.js signin endpoint
-    window.location.href = '/api/auth/signin/google?callbackUrl=/'
+    
   } catch (error) {
     console.error('Google sign in error:', error)
   } finally {
@@ -113,22 +112,9 @@ const continueAsGuest = () => {
   router.push('/')
 }
 
-// Check authentication status
-const checkAuthStatus = async () => {
-  try {
-    const response = await $fetch('/api/auth/session')
-    if (response?.user) {
-      // User is authenticated, redirect to home page
-      router.push('/')
-    }
-  } catch (error) {
-    // Not authenticated, stay on login page
-    console.log('Not authenticated')
-  }
-}
+// Check authentication statu
 
 // Check authentication status on mount
 onMounted(() => {
-  checkAuthStatus()
 })
 </script>
