@@ -13,7 +13,7 @@
       <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
         <div class="space-y-6">
           <!-- Google Login Button -->
-          <div>
+          <div class="flex justify-center">
             <GoogleSignInButton @success="handleLoginSuccess" @error="handleLoginError"></GoogleSignInButton>
           </div>
 
@@ -61,11 +61,12 @@ import {
   GoogleSignInButton,
   type CredentialResponse,
 } from "vue3-google-signin";
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 // handle success event
 const handleLoginSuccess = (response: CredentialResponse) => {
   const { credential } = response;
+  console.log(response)
   console.log("Access Token", credential);
 };
 
