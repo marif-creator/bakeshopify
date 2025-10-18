@@ -1,13 +1,14 @@
 <template>
   <div class="mini-cart relative">
     <!-- Cart Trigger Button -->
-    <button
+    <NuxtLink
+      id="minicart"
+      to="/cart"
       class="mini-cart__trigger flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 transition-colors"
       @mouseenter="showCartPreview"
       @mouseleave="hideCartPreview"
-      @click="toggleCart"
     >
-      <Icon id="minicart" name="mdi:cart" size="20" class="text-gray-600" />
+      <Icon name="mdi:cart" size="20" class="text-gray-600" />
       <!-- Cart Counter Badge -->
       <span
         v-if="itemCount > 0"
@@ -15,7 +16,7 @@
       >
         {{ itemCount > 99 ? '99+' : itemCount }}
       </span>
-    </button>
+    </NuxtLink>
 
     <!-- Cart Preview Dropdown -->
     <Transition
@@ -86,15 +87,6 @@
           </div>
 
           <div class="space-y-2">
-            <UButton
-              color="primary"
-              variant="solid"
-              size="sm"
-              class="w-full"
-              @click="viewCart"
-            >
-              View Cart
-            </UButton>
             <UButton
               color="neutral"
               variant="outline"
@@ -182,6 +174,7 @@ const viewCart = () => {
   // You can add navigation logic here if you have a cart page
   // navigateTo('/cart')
 }
+
 
 const checkout = () => {
   // Navigate to checkout page

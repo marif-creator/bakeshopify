@@ -75,8 +75,8 @@ export const useFlyingAnimation = () => {
 
       // Set initial position for flying image
       flyingImage.style.position = 'fixed'
-      flyingImage.style.left = `${productRect.left + productRect.width / 2}px`
-      flyingImage.style.top = `${productRect.top + productRect.height / 2}px`
+      flyingImage.style.left = `${productRect.left}px`
+      flyingImage.style.top = `${productRect.top}px`
       flyingImage.style.width = `${productRect.width}px`
       flyingImage.style.height = `${productRect.height}px`
       flyingImage.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
@@ -90,8 +90,8 @@ export const useFlyingAnimation = () => {
       flyingImage.offsetHeight
 
       // Animate flying image to cart
-      flyingImage.style.left = `${cartRect.left + cartRect.width / 2}px`
-      flyingImage.style.top = `${cartRect.top + cartRect.height / 2}px`
+      flyingImage.style.left = `${cartRect.left}px`
+      flyingImage.style.top = `${cartRect.top}px`
       flyingImage.style.width = `${productRect.width * scale}px`
       flyingImage.style.height = `${productRect.height * scale}px`
       flyingImage.style.opacity = opacity.toString()
