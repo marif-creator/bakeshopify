@@ -118,16 +118,7 @@
 
 
         <!-- Cart -->
-        <div class="relative">
-          <button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 transition-colors">
-            <Icon name="mdi:cart" size="20" class="text-gray-600" />
-            <!-- Cart Counter Badge -->
-            <span
-              class="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-              {{ cartItemCount }}
-            </span>
-          </button>
-        </div>
+        <MiniCart />
       </div>
     </div>
     <!-- Navigation Menu -->
@@ -270,6 +261,7 @@ import ButtonLink from '~/components/ButtonLink.vue';
 import IconLink from '~/components/IconLink.vue';
 import SelectGhost from '~/components/SelectGhost.vue';
 import SearchBar from '~/components/SearchBar.vue';
+import MiniCart from '~/components/MiniCart.vue';
 
 // NextAuth.js session state
 const data = ref<any>(null)
@@ -278,7 +270,6 @@ const loading = ref(true)
 
 const selectedLanguage = ref('EN');
 const selectedCurrency = ref('USD');
-const cartItemCount = ref(0);
 
 // Scroll-based link visibility
 const isLinkVisible = ref(true);

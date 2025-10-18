@@ -15,7 +15,7 @@
         :price="19.00"
         :stock="48"
         :weight-options="weightOptions"
-        :id="productSlug"
+        :id="productId"
         :image="productImages[0]"
         :slug="productSlug"
       />
@@ -36,11 +36,12 @@ import { onMounted } from 'vue'
 
 // Route parameters
 const route = useRoute()
-const storeSlug = route.params['store-slug']
-const productSlug = route.params['product-slug']
+const storeSlug = route.params['store-slug'] as string
+const productSlug = route.params['product-slug'] as string
 
 // Sample product data (in a real app, this would come from an API or database)
 const productName = `Dried Aonori Seaweed`
+const productId = `prod_${productSlug}_${Date.now()}` // Generate unique product ID
 const productImages = [
   'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg', // Dried seaweed flakes
   'https://images.pexels.com/photos/128402/pexels-photo-128402.jpeg',  // Seaweed in bowl
