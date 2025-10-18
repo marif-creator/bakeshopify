@@ -7,7 +7,7 @@
     </div>
 
     <!-- Product Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 grid-equal-heights">
       <ProductThumbnail
         v-for="product in products"
         :key="product.id"
@@ -171,6 +171,23 @@ const products = ref([
 /* Mobile-first responsive grid */
 .grid {
   display: grid;
+}
+
+/* Auto rows for equal height in grid */
+.auto-rows-max {
+  grid-auto-rows: max-content;
+}
+
+/* CSS Grid with equal height items */
+.grid-equal-heights {
+  display: grid;
+}
+
+.grid-equal-heights > * {
+  /* Ensure all direct children have equal height */
+  height: 100%;
+  /* Prevent content from overflowing */
+  overflow: hidden;
 }
 
 /* 2 columns on mobile */
