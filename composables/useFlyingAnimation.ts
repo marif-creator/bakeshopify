@@ -68,8 +68,8 @@ export const useFlyingAnimation = () => {
 
     // Set initial position (absolute positioning)
     flyingImage.style.position = 'fixed'
-    flyingImage.style.left = `${sourceRect.left + sourceRect.width / 2}px`
-    flyingImage.style.top = `${sourceRect.top + sourceRect.height / 2}px`
+    flyingImage.style.left = `${sourceRect.left}px`
+    flyingImage.style.top = `${sourceRect.top}px`
     flyingImage.style.width = `${sourceRect.width}px`
     flyingImage.style.height = `${sourceRect.height}px`
     flyingImage.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
@@ -83,8 +83,8 @@ export const useFlyingAnimation = () => {
     flyingImage.offsetHeight
 
     // Animate to target position (scaled down)
-    flyingImage.style.left = `${targetRect.left + targetRect.width / 2}px`
-    flyingImage.style.top = `${targetRect.top + targetRect.height / 2}px`
+    flyingImage.style.left = `${targetRect.left}px`
+    flyingImage.style.top = `${targetRect.top}px`
     flyingImage.style.width = `${sourceRect.width * scale}px`
     flyingImage.style.height = `${sourceRect.height * scale}px`
     flyingImage.style.opacity = opacity.toString()
