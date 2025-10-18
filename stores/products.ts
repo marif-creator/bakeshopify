@@ -1,3 +1,13 @@
+// Product option interface
+export interface ProductOption {
+  type: string
+  value: string
+  required?: boolean
+  price?: number
+  stock?: number
+  sku?: string
+}
+
 // Product interface definitions
 export interface Product {
   id: string
@@ -20,6 +30,7 @@ export interface Product {
   features: string[]
   specifications: Record<string, string>
   tags: string[]
+  options?: ProductOption[]
   createdAt: string
   updatedAt: string
 }
@@ -66,6 +77,14 @@ const sampleProducts: Product[] = [
       'Camera': '50MP + 12MP + 10MP',
       'Battery': '4400mAh'
     },
+    options: [
+      { type: 'memory', value: '256GB', required: true },
+      { type: 'memory', value: '512GB', required: true, price: 2000000 },
+      { type: 'memory', value: '1TB', required: true, price: 4000000 },
+      { type: 'color', value: 'Phantom Black', required: false },
+      { type: 'color', value: 'Cream', required: false },
+      { type: 'color', value: 'Phantom Silver', required: false }
+    ],
     tags: ['smartphone', 'foldable', 'flagship', '5g'],
     createdAt: '2024-01-15T00:00:00Z',
     updatedAt: '2024-10-18T00:00:00Z'
@@ -101,6 +120,15 @@ const sampleProducts: Product[] = [
       'Camera': '48MP + 12MP + 12MP',
       'Battery': '3274mAh'
     },
+    options: [
+      { type: 'memory', value: '128GB', required: true },
+      { type: 'memory', value: '256GB', required: true, price: 1500000 },
+      { type: 'memory', value: '512GB', required: true, price: 3000000 },
+      { type: 'color', value: 'Natural Titanium', required: false },
+      { type: 'color', value: 'Blue Titanium', required: false },
+      { type: 'color', value: 'White Titanium', required: false },
+      { type: 'color', value: 'Black Titanium', required: false }
+    ],
     tags: ['smartphone', 'premium', 'ios', '5g'],
     createdAt: '2024-01-10T00:00:00Z',
     updatedAt: '2024-10-18T00:00:00Z'
@@ -132,6 +160,11 @@ const sampleProducts: Product[] = [
       'Shelf Life': '12 months',
       'Storage': 'Cool, dry place'
     },
+    options: [
+      { type: 'weight', value: '100g', required: false },
+      { type: 'weight', value: '200g', required: false },
+      { type: 'weight', value: '500g', required: false, price: 15000 }
+    ],
     tags: ['seaweed', 'healthy', 'natural', 'japanese'],
     createdAt: '2024-02-01T00:00:00Z',
     updatedAt: '2024-10-18T00:00:00Z'
@@ -165,6 +198,12 @@ const sampleProducts: Product[] = [
       'Charging': 'USB-C, Wireless',
       'Connectivity': 'Bluetooth 5.2'
     },
+    options: [
+      { type: 'color', value: 'Black', required: false },
+      { type: 'color', value: 'White', required: false },
+      { type: 'color', value: 'Blue', required: false },
+      { type: 'color', value: 'Pink', required: false }
+    ],
     tags: ['wireless', 'earbuds', 'audio', 'bluetooth'],
     createdAt: '2024-01-20T00:00:00Z',
     updatedAt: '2024-10-18T00:00:00Z'
@@ -302,6 +341,27 @@ export const useProductStore = defineStore('products', {
     // Check if product exists
     productExists: (state) => (slug: string) => {
       return state.products.some(product => product.slug === slug)
+    },
+
+    // Get product options by type
+    getProductOptionsByType: (state) => (productId: string, optionType: string) => {
+      const product = state.products.find(p => p.id === productId)
+      if (!product || !product.options) return []
+      return product.options.filter(option => option.type === optionType)
+    },
+
+    // Get required options for a product
+    getRequiredOptions: (state) => (productId: string) => {
+      const product = state.products.find(p => p.id === productId)
+      if (!product || !product.options) return []
+      return product.options.filter(option => option.required === true)
+    },
+
+    // Get available options for a product (non-required)
+    getOptionalOptions: (state) => (productId: string) => {
+      const product = state.products.find(p => p.id === productId)
+      if (!product || !product.options) return []
+      return product.options.filter(option => option.required !== true)
     }
   },
 
@@ -391,7 +451,7 @@ export const useProductStore = defineStore('products', {
     },
 
     // Update existing product
-    updateProduct(id: string, updates: Partial<Product>) {
+    updateProduct(id: string, updates: any) {
       const index = this.products.findIndex(product => product.id === id)
       if (index !== -1) {
         this.products[index] = { ...this.products[index], ...updates }

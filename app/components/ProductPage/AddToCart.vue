@@ -17,7 +17,11 @@
 
     <!-- Price -->
     <div class="add-to-cart__price">
-      ${{ price.toFixed(2) }}
+      <div class="price-breakdown">
+        <span class="base-price">${{ props.price.toFixed(2) }}</span>
+        <span v-if="optionsPrice > 0" class="options-price">+ ${{ optionsPrice.toFixed(2) }}</span>
+        <span class="total-price">= ${{ totalPrice.toFixed(2) }}</span>
+      </div>
     </div>
 
     <!-- Stock indicator -->
@@ -28,19 +32,29 @@
       </div>
     </div>
 
-    <!-- Weight/Size selector -->
-    <div class="add-to-cart__weight-section">
-      <label class="add-to-cart__label">Weight: {{ selectedWeight }}</label>
-      <div class="add-to-cart__weight-options">
-        <button
-          v-for="weight in weightOptions"
-          :key="weight.value"
-          class="add-to-cart__weight-btn"
-          :class="{ 'add-to-cart__weight-btn--active': selectedWeight === weight.value }"
-          @click="selectWeight(weight.value)"
-        >
-          {{ weight.label }}
-        </button>
+
+    <!-- Product Options -->
+    <div v-if="Object.keys(optionsByType).length > 0" class="add-to-cart__options-section">
+      <div v-for="(options, optionType) in optionsByType" :key="optionType" class="add-to-cart__option-group">
+        <label class="add-to-cart__label">
+          {{ optionType.charAt(0).toUpperCase() + optionType.slice(1) }}:
+          <span class="selected-option">{{ selectedOptions[optionType] }}</span>
+        </label>
+        <div class="add-to-cart__option-buttons">
+          <button
+            v-for="option in options"
+            :key="`${optionType}-${option.value}`"
+            class="add-to-cart__option-btn"
+            :class="{
+              'add-to-cart__option-btn--active': selectedOptions[optionType] === option.value,
+              'add-to-cart__option-btn--required': option.required
+            }"
+            @click="selectOption(optionType, option.value)"
+          >
+            {{ option.value }}
+            <span v-if="option.price" class="option-price">+${{ option.price }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -91,37 +105,94 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 
 // Props
 interface Props {
   title?: string
   price?: number
   stock?: number
-  weightOptions?: Array<{ label: string; value: string }>
   maxQuantity?: number
   id?: string | number
   image?: string
   slug?: string
+  storeSlug?: string
+  options?: Array<{
+    type: string
+    value: string
+    required?: boolean
+    price?: number
+    stock?: number
+    sku?: string
+  }>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Product Title',
   price: 19.00,
   stock: 48,
-  weightOptions: () => [
-    { label: '100gm', value: '100gm' },
-    { label: '200gm', value: '200gm' }
-  ],
-  maxQuantity: 99
+  maxQuantity: 99,
+  options: () => [],
+  storeSlug: 'default-store'
 })
 
 // Reactive state
 const quantity = ref(1)
-const selectedWeight = ref(props.weightOptions[0]?.value || '100gm')
+const selectedOptions = ref<Record<string, string>>({})
+
+// Computed properties
+const optionsByType = computed(() => {
+  if (!props.options || props.options.length === 0) return {}
+
+  return props.options.reduce((acc, option) => {
+    if (!acc[option.type]) {
+      acc[option.type] = []
+    }
+    (acc[option.type] as any[]).push(option)
+    return acc
+  }, {} as Record<string, any[]>)
+})
+
+const optionsPrice = computed(() => {
+  if (!props.options || props.options.length === 0) return 0
+
+  return props.options
+    .filter(option => selectedOptions.value[option.type] === option.value && option.price)
+    .reduce((total, option) => total + (option.price || 0), 0)
+})
+
+const totalPrice = computed(() => {
+  return (props.price + optionsPrice.value) * quantity.value
+})
+
+// Initialize selected options when props.options changes
+watch(() => props.options, (newOptions) => {
+  if (newOptions && newOptions.length > 0) {
+    // Initialize with first option of each type
+    const initialSelections: Record<string, string> = {}
+    const optionTypes = [...new Set(newOptions.map(opt => opt.type))]
+
+    optionTypes.forEach(type => {
+      const optionsOfType = newOptions.filter(opt => opt.type === type)
+      if (optionsOfType.length > 0 && optionsOfType[0]) {
+        initialSelections[type] = optionsOfType[0].value
+      }
+    })
+
+    selectedOptions.value = initialSelections
+    console.log('Initialized selected options:', initialSelections)
+  }
+}, { immediate: true })
+
+// Debug: Watch for changes in selectedOptions
+watch(() => selectedOptions.value, (newSelections) => {
+  console.log('Selected options changed:', newSelections)
+}, { deep: true })
 
 // Methods
-const selectWeight = (weight: string) => {
-  selectedWeight.value = weight
+
+const selectOption = (optionType: string, optionValue: string) => {
+  selectedOptions.value[optionType] = optionValue
 }
 
 const decreaseQuantity = () => {
@@ -137,21 +208,40 @@ const increaseQuantity = () => {
 }
 
 // Import cart store and flying animation composable
-import { useCartStore } from '../../../stores/cart'
+import { useCartStore, generateCartItemId } from '../../../stores/cart'
 import { useFlyingAnimation } from '../../../composables/useFlyingAnimation'
 
 const addToCart = async () => {
   // Get the flying animation composable
   const { animateToCart } = useFlyingAnimation()
 
+  // Generate unique ID for this product configuration
+  const uniqueId = generateCartItemId(String(props.id || 'default-id'), selectedOptions.value)
+
+  console.log('Adding to cart:', {
+    id: props.id,
+    name: props.title,
+    selectedOptions: selectedOptions.value,
+    uniqueId,
+    totalPrice: totalPrice.value
+  })
+
   // Prepare cart item data
   const cartItem = {
     id: props.id || 'default-id',
     name: props.title || 'Product',
-    price: props.price || 0,
+    price: totalPrice.value, // Use total price including options
     image: props.image || '',
-    slug: props.slug
+    slug: props.slug,
+    storeSlug: props.storeSlug, // Include store slug for proper navigation
+    selectedOptions: selectedOptions.value, // Include selected options
+    basePrice: props.price, // Store base price for reference
+    optionsPrice: optionsPrice.value, // Store options price for reference
+    uniqueId // Unique identifier for this specific configuration
   }
+
+  // detach cart item from reactive
+  const cartItemFromJson = JSON.parse(JSON.stringify(cartItem))
 
   try {
     // Wait for flying animation to complete
@@ -160,16 +250,18 @@ const addToCart = async () => {
     if (animationResult) {
       // This runs when animation completes
       const cartStore = useCartStore()
-      cartStore.addItem(cartItem)
+      cartStore.addItem(cartItemFromJson)
 
       // Reset quantity to 1 after adding to cart
       quantity.value = 1
 
       console.log('Added to cart (animation complete):', {
         title: props.title,
-        price: props.price,
-        weight: selectedWeight.value,
+        basePrice: props.price,
+        optionsPrice: optionsPrice.value,
+        totalPrice: totalPrice.value,
         quantity: quantity.value,
+        selectedOptions: selectedOptions.value,
         id: props.id,
         image: props.image,
         slug: props.slug
@@ -184,9 +276,11 @@ const buyNow = () => {
   // Handle buy now logic
   console.log('Buy now:', {
     title: props.title,
-    price: props.price,
-    weight: selectedWeight.value,
-    quantity: quantity.value
+    basePrice: props.price,
+    optionsPrice: optionsPrice.value,
+    totalPrice: totalPrice.value,
+    quantity: quantity.value,
+    selectedOptions: selectedOptions.value
   })
 }
 
@@ -257,6 +351,30 @@ const handleShare = () => {
   margin-bottom: 1rem;
 }
 
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.base-price {
+  color: #666;
+  text-decoration: line-through;
+  font-size: 1rem;
+}
+
+.options-price {
+  color: #166534;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.total-price {
+  color: #1a1a1a;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
 .add-to-cart__stock {
   margin-bottom: 1.5rem;
 }
@@ -316,8 +434,75 @@ const handleShare = () => {
   background-color: #f9fafb;
 }
 
+.add-to-cart__options-section {
+  margin-bottom: 1.5rem;
+}
+
+.add-to-cart__option-group {
+  margin-bottom: 1.5rem;
+}
+
+.add-to-cart__option-group:last-child {
+  margin-bottom: 0;
+}
+
+.add-to-cart__option-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.add-to-cart__option-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #374151;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.add-to-cart__option-btn--active {
+  background-color: #1a1a1a;
+  color: white;
+  border-color: #1a1a1a;
+}
+
+.add-to-cart__option-btn--required {
+  border-color: #ef4444;
+}
+
+.add-to-cart__option-btn--required.add-to-cart__option-btn--active {
+  background-color: #ef4444;
+  border-color: #ef4444;
+}
+
+.add-to-cart__option-btn:hover:not(.add-to-cart__option-btn--active) {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.option-price {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.125rem;
+}
+
+.selected-option {
+  color: #166534;
+  font-weight: 600;
+}
+
 .add-to-cart__quantity-selector {
   display: flex;
+  width: fit-content;
   align-items: center;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
@@ -417,6 +602,16 @@ const handleShare = () => {
 
   .add-to-cart__weight-options {
     flex-wrap: wrap;
+  }
+
+  .add-to-cart__option-buttons {
+    gap: 0.375rem;
+  }
+
+  .add-to-cart__option-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+    min-width: 50px;
   }
 }
 </style>

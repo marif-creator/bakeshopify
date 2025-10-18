@@ -141,7 +141,7 @@
 
             <!-- Cart Items -->
             <div class="space-y-4 mb-6">
-              <div v-for="item in cartStore.items" :key="item.id" class="flex items-center space-x-4">
+              <div v-for="item in cartStore.items" :key="item.uniqueId" class="flex items-center space-x-4">
                 <img
                   :src="item.image"
                   :alt="item.name"
@@ -149,6 +149,15 @@
                 />
                 <div class="flex-1">
                   <h3 class="font-medium text-gray-900">{{ item.name }}</h3>
+
+                  <!-- Selected Options -->
+                  <div v-if="item.selectedOptions" class="selected-options mt-1">
+                    <div v-for="(value, type) in item.selectedOptions" :key="type" class="option-badge">
+                      <span class="option-type">{{ type }}:</span>
+                      <span class="option-value">{{ value }}</span>
+                    </div>
+                  </div>
+
                   <p class="text-sm text-gray-600">Quantity: {{ item.quantity }}</p>
                 </div>
                 <div class="text-right">
@@ -306,5 +315,30 @@ watch(() => checkoutStore.payment, () => {
 </script>
 
 <style scoped>
-/* Additional custom styles if needed */
+.selected-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.option-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.7rem;
+}
+
+.option-type {
+  font-weight: 600;
+  color: #374151;
+  margin-right: 0.125rem;
+}
+
+.option-value {
+  color: #6b7280;
+}
 </style>

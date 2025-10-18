@@ -37,7 +37,7 @@
             <div class="cart-items-list">
               <div
                 v-for="item in cartStore.items"
-                :key="item.id"
+                :key="item.uniqueId"
                 class="cart-item p-6 border-b border-gray-100 last:border-b-0"
               >
                 <div class="cart-item-content flex items-center space-x-4">
@@ -52,14 +52,28 @@
 
                   <!-- Product Details -->
                   <div class="cart-item-details flex-1 min-w-0">
-                    <h3 class="text-lg font-medium text-gray-900 mb-1 truncate">{{ item.name }}</h3>
+                    <!-- Clickable Product Title -->
+                    <NuxtLink
+                      :to="getProductUrl(item)"
+                      class="text-lg font-medium text-gray-900 mb-1 truncate hover:text-blue-600 transition-colors cursor-pointer block"
+                    >
+                      {{ item.name }}
+                    </NuxtLink>
                     <p class="text-sm text-gray-500 mb-2">Product ID: {{ item.id }}</p>
+
+                    <!-- Selected Options -->
+                    <div v-if="item.selectedOptions" class="selected-options mb-3">
+                      <div v-for="(value, type) in item.selectedOptions" :key="type" class="option-badge">
+                        <span class="option-type">{{ type }}:</span>
+                        <span class="option-value">{{ value }}</span>
+                      </div>
+                    </div>
 
                     <!-- Quantity Controls -->
                     <div class="quantity-controls flex items-center space-x-3">
                       <button
                         class="quantity-btn w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
-                        @click="decreaseQuantity(item.id)"
+                        @click="decreaseQuantity(item.uniqueId || item.id)"
                         :disabled="item.quantity <= 1"
                       >
                         <Icon name="mdi:minus" size="16" />
@@ -69,7 +83,7 @@
 
                       <button
                         class="quantity-btn w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
-                        @click="increaseQuantity(item.id)"
+                        @click="increaseQuantity(item.uniqueId || item.id)"
                       >
                         <Icon name="mdi:plus" size="16" />
                       </button>
@@ -85,7 +99,7 @@
 
                     <button
                       class="remove-btn text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
-                      @click="removeItem(item.id)"
+                      @click="removeItem(item.uniqueId || item.id)"
                     >
                       Remove
                     </button>
@@ -237,6 +251,19 @@ const continueShopping = () => {
   navigateTo('/')
 }
 
+// Method to generate product URL with options
+const getProductUrl = (item: any) => {
+  if (!item.slug) {
+    console.warn('Product slug not available for cart item:', item.name)
+    return '/' // Fallback to home page
+  }
+
+  // Use store slug from cart item, fallback to default if not available
+  const storeSlug = item.storeSlug || 'default-store'
+
+  return `/${storeSlug}/${item.slug}`
+}
+
 // Page meta
 useHead({
   title: `Shopping Cart (${cartStore.totalItems} items) - BakeShopify`,
@@ -265,6 +292,55 @@ useHead({
 
 .quantity-display {
   min-width: 3rem;
+}
+
+.selected-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.option-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.option-badge::before {
+  content: "•";
+  color: #166534;
+  font-weight: bold;
+  margin-right: 0.25rem;
+}
+
+.option-type {
+  font-weight: 600;
+  color: #374151;
+  margin-right: 0.25rem;
+}
+
+.option-value {
+  color: #6b7280;
+}
+
+/* Enhanced visual separation for different option combinations */
+.cart-item {
+  position: relative;
+}
+
+.cart-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #e5e7eb 20%, #e5e7eb 80%, transparent 100%);
 }
 
 /* Responsive adjustments */

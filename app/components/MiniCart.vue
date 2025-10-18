@@ -43,7 +43,7 @@
         <div class="mini-cart__preview-items max-h-64 overflow-y-auto">
           <div
             v-for="item in cartStore.items"
-            :key="item.id"
+            :key="item.uniqueId"
             class="mini-cart__preview-item flex items-center p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors"
           >
             <!-- Product Image -->
@@ -57,7 +57,22 @@
 
             <!-- Product Info -->
             <div class="mini-cart__item-info flex-1 ml-3">
-              <h4 class="text-sm font-medium text-gray-900 line-clamp-2">{{ item.name }}</h4>
+              <!-- Clickable Product Title -->
+              <NuxtLink
+                :to="getProductUrl(item)"
+                class="text-sm font-medium text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer"
+                @click="hideCartPreview"
+              >
+                {{ item.name }}
+              </NuxtLink>
+
+              <!-- Selected Options -->
+              <div v-if="item.selectedOptions" class="mt-1">
+                <div v-for="(value, type) in item.selectedOptions" :key="type" class="text-xs text-gray-600">
+                  {{ type.charAt(0).toUpperCase() + type.slice(1) }}: {{ value }}
+                </div>
+              </div>
+
               <div class="flex items-center justify-between mt-1">
                 <div class="flex items-center space-x-2">
                   <span class="text-sm text-gray-600">Qty: {{ item.quantity }}</span>
@@ -71,7 +86,7 @@
             <!-- Remove Button -->
             <button
               class="mini-cart__item-remove ml-2 p-1 text-gray-400 hover:text-red-500 transition-colors"
-              @click.stop="removeItem(item.id)"
+              @click.stop="removeItem(item.uniqueId || item.id)"
             >
               <Icon name="mdi:close" size="16" />
             </button>
@@ -184,6 +199,19 @@ const checkout = () => {
   navigateTo('/checkout')
 }
 
+// Method to generate product URL with options
+const getProductUrl = (item: any) => {
+  if (!item.slug) {
+    console.warn('Product slug not available for cart item:', item.name)
+    return '/' // Fallback to home page
+  }
+
+  // Use store slug from cart item, fallback to default if not available
+  const storeSlug = item.storeSlug || 'default-store'
+
+  return `/${storeSlug}/${item.slug}`
+}
+
 onUnmounted(() => {
   if (previewTimer.value) {
     clearTimeout(previewTimer.value)
@@ -203,6 +231,21 @@ onUnmounted(() => {
 .mini-cart__preview,
 .mini-cart__empty {
   z-index: 1000;
+}
+
+/* Enhanced visual separation for different option combinations */
+.mini-cart__preview-item {
+  position: relative;
+}
+
+.mini-cart__preview-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #f3f4f6 20%, #f3f4f6 80%, transparent 100%);
 }
 
 /* Scrollbar styling for cart items */

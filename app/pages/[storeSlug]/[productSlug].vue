@@ -28,10 +28,11 @@
           :title="productName"
           :price="productPrice"
           :stock="productStock"
-          :weight-options="weightOptions"
           :id="productId"
           :image="productImages[0]"
           :slug="productSlug"
+          :store-slug="storeSlug"
+          :options="currentProduct?.options || []"
         />
       </div>
 
@@ -71,11 +72,6 @@ const productStock = computed(() => currentProduct.value?.stock || 0)
 const isLoading = computed(() => productStore.loading)
 const error = computed(() => productStore.error)
 
-// Weight options for the AddToCart component (could also come from product data)
-const weightOptions = [
-  { label: '100gm', value: '100gm' },
-  { label: '200gm', value: '200gm' }
-]
 
 // Fetch product data when component mounts
 onMounted(() => {
