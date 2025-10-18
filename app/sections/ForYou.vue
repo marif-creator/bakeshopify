@@ -6,165 +6,50 @@
       <p class="text-gray-600">Discover products tailored just for you</p>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="productStore.loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <span class="ml-3 text-gray-600">Loading products...</span>
+    </div>
+
     <!-- Product Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 grid-equal-heights">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 grid-equal-heights">
       <ProductThumbnail
         v-for="product in products"
         :key="product.id"
         :product="product"
+        :store-slug="product.brand.toLowerCase().replace(/\s+/g, '-')"
+        :product-slug="product.title.toLowerCase().replace(/\s+/g, '-')"
       />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-// Sample product data
-const products = ref([
-  {
-    id: '1',
-    title: 'Samsung Galaxy Z Fold6',
-    price: 19999000,
-    originalPrice: 24999000,
-    discount: 25,
-    rating: 5.0,
-    soldCount: 50,
-    isOfficialStore: true,
-    brand: 'Samsung',
-    features: ['Note Assist', 'Photo Assist', 'Smart Select']
-  },
-  {
-    id: '2',
-    title: 'STANLEY ICEFLOW',
-    price: 740000,
-    originalPrice: 820000,
-    discount: 10,
-    rating: 5.0,
-    soldCount: 500,
-    isOfficialStore: true,
-    brand: 'STANLEY',
-    features: ['Insulated', 'BPA Free', 'Leak Proof']
-  },
-  {
-    id: '3',
-    title: 'HISENSE RR58D4IGN',
-    price: 1105000,
-    originalPrice: 1350000,
-    discount: 18,
-    rating: 4.8,
-    soldCount: 150,
-    isOfficialStore: true,
-    brand: 'HISENSE',
-    features: ['Energy Efficient', 'Quiet Operation', 'Large Capacity']
-  },
-  {
-    id: '4',
-    title: 'LENOVO LOQ 15IRX9',
-    price: 13499000,
-    originalPrice: 16499000,
-    discount: 18,
-    rating: 4.9,
-    soldCount: 250,
-    isOfficialStore: true,
-    brand: 'LENOVO',
-    features: ['Gaming Laptop', 'RTX Graphics', 'High Performance']
-  },
-  {
-    id: '5',
-    title: 'SKIN1004 Madagascar Centella Cream',
-    price: 450000,
-    originalPrice: 550000,
-    discount: 18,
-    rating: 4.9,
-    soldCount: 750,
-    isOfficialStore: true,
-    brand: 'SKIN1004',
-    features: ['Brightening', 'Soothing', 'Natural Ingredients']
-  },
-  {
-    id: '6',
-    title: 'Blackmores I-Folic 60',
-    price: 115400,
-    originalPrice: 128200,
-    discount: 10,
-    rating: 5.0,
-    soldCount: 100,
-    isOfficialStore: true,
-    brand: 'Blackmores',
-    features: ['Vitamin Supplement', 'Folic Acid', 'Health Support']
-  },
-  {
-    id: '7',
-    title: '150 ML MINYAK TELON MY BABY',
-    price: 33700,
-    originalPrice: 42000,
-    discount: 20,
-    rating: 4.9,
-    soldCount: 200,
-    isOfficialStore: false,
-    brand: 'MY BABY',
-    features: ['Baby Oil', 'Natural Formula', 'Gentle Care']
-  },
-  {
-    id: '8',
-    title: 'Apple iPad 11 2025',
-    price: 4535000,
-    originalPrice: 5000000,
-    discount: 9,
-    rating: 5.0,
-    soldCount: 180,
-    isOfficialStore: true,
-    brand: 'Apple',
-    features: ['Latest Model', 'High Resolution', 'Fast Performance']
-  },
-  {
-    id: '9',
-    title: 'Sepatu Running 910',
-    price: 393518,
-    originalPrice: 480000,
-    discount: 18,
-    rating: 4.9,
-    soldCount: 400,
-    isOfficialStore: false,
-    brand: 'Orion Sport',
-    features: ['Running Shoes', 'Comfortable', 'Durable']
-  },
-  {
-    id: '10',
-    title: 'DJI Mini 3 - 4K Camera Drone',
-    price: 7930000,
-    originalPrice: 9500000,
-    discount: 17,
-    rating: 5.0,
-    soldCount: 180,
-    isOfficialStore: true,
-    brand: 'DJI',
-    features: ['4K Camera', 'Lightweight', 'Easy Control']
-  },
-  {
-    id: '11',
-    title: 'ANTBOX Lemari Pakaian',
-    price: 1759000,
-    originalPrice: 2150000,
-    discount: 18,
-    rating: 4.9,
-    soldCount: 750,
-    isOfficialStore: true,
-    brand: 'ANTBOX',
-    features: ['Wardrobe', 'Spacious', 'Modern Design']
-  },
-  {
-    id: '12',
-    title: 'Xiaomi Poco X7 Pro 5G',
-    price: 3515000,
-    originalPrice: 4500000,
-    discount: 22,
-    rating: 5.0,
-    soldCount: 250,
-    isOfficialStore: true,
-    brand: 'Xiaomi',
-    features: ['5G Smartphone', 'Fast Charging', 'Great Camera']
-  }
-])
+import { useProductStore } from '~~/stores/products'
+
+// Initialize product store
+const productStore = useProductStore()
+
+// Fetch products when component mounts
+await productStore.fetchProducts()
+
+// Transform product store data to match ProductThumbnail expected format
+const products = computed(() => {
+  return productStore.getAllProducts.map((product: any) => ({
+    id: product.id,
+    title: product.title,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    discount: product.discount,
+    rating: product.rating,
+    soldCount: product.reviewCount, // Map reviewCount to soldCount
+    isOfficialStore: product.isOfficialStore,
+    brand: product.brand,
+    features: product.features.slice(0, 3), // Limit to first 3 features
+    image: product.images[0] // Use first image as primary
+  }))
+})
 </script>
 
 <style scoped>

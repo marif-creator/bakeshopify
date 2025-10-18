@@ -21,9 +21,8 @@
         <!-- Product Image (Clickable for Navigation) -->
         <div class="pt-8 pb-4" :id="`product-image-${props.product.id}`">
           <NuxtLink :to="`/${props.storeSlug}/${props.productSlug}`">
-            <img v-if="!imageLoading && productImage" :src="productImage" :alt="product.title"
-              class="w-full h-32 object-contain mx-auto transition-opacity duration-300 hover:opacity-80 cursor-pointer"
-              @load="imageLoading = false" />
+            <img v-if="props.product.image" :src="props.product.image" :alt="props.product.title"
+              class="w-full h-32 object-contain mx-auto transition-opacity duration-300 hover:opacity-80 cursor-pointer" />
             <div v-else
               class="w-full h-32 flex items-center justify-center bg-gray-100 rounded cursor-pointer hover:bg-gray-200 transition-colors">
               <UIcon name="i-heroicons-photo" class="w-8 h-8 text-gray-400" />
@@ -114,85 +113,12 @@ const props = withDefaults(defineProps<{
   productSlug: 'samsung-galaxy-z-fold6'
 })
 
-// Reactive state for image handling
-const productImage = ref<string>('')
-const imageLoading = ref<boolean>(true)
+// Reactive state
 const isAddingToCart = ref<boolean>(false)
 
 // Import cart store and flying animation composable
 import { useCartStore } from '../../stores/cart'
 import { useFlyingAnimation } from '../../composables/useFlyingAnimation'
-
-// Pexels API response interfaces
-interface PexelsPhoto {
-  id: number
-  src: {
-    medium: string
-    large: string
-    small: string
-  }
-}
-
-interface PexelsResponse {
-  photos: PexelsPhoto[]
-  total_results: number
-  page: number
-}
-
-// Pexels API configuration
-const { $config } = useNuxtApp()
-const PEXELS_API_KEY = $config.public.pexelsApiKey
-
-// Fetch image from Pexels API
-const fetchProductImage = async (query: string) => {
-  try {
-    imageLoading.value = true
-
-    // Use a generic tech/phone related search term
-    const searchQuery = 'smartphone mobile phone technology'
-
-    const response = await $fetch<PexelsResponse>('https://api.pexels.com/v1/search', {
-      method: 'GET',
-      headers: {
-        'Authorization': PEXELS_API_KEY
-      },
-      params: {
-        query: searchQuery,
-        per_page: 1,
-        page: Math.floor(Math.random() * 10) + 1 // Random page for variety
-      }
-    })
-
-    if (response.photos && response.photos.length > 0 && response.photos[0]) {
-      productImage.value = response.photos[0].src.medium
-    } else {
-      // Fallback to placeholder if no images found
-      productImage.value = `https://picsum.photos/300/300?random=${Date.now()}`
-    }
-  } catch (error) {
-    console.error('Error fetching image from Pexels:', error)
-    // Fallback to placeholder on error
-    productImage.value = `https://picsum.photos/300/300?random=${Date.now()}`
-  } finally {
-    imageLoading.value = false
-  }
-}
-
-// Format price in Indonesian Rupiah
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price)
-}
-
-
-// Fetch image when component mounts
-onMounted(() => {
-  fetchProductImage(props.product.title)
-})
 
 // Add to cart functionality with flying animation
 const addToCart = async () => {
@@ -206,7 +132,7 @@ const addToCart = async () => {
     id: props.product.id,
     name: props.product.title,
     price: props.product.price,
-    image: productImage.value,
+    image: props.product.image || `https://picsum.photos/300/300?random=${Date.now()}`,
     slug: props.productSlug
   }
 

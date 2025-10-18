@@ -3,22 +3,37 @@
     <div class="product-page__container flex flex-row">
       
 
-      <!-- Product Preview Component -->
-      <ProductPreview
-        :images="productImages"
-        :alt-text="productName"
-      />
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <span class="ml-3 text-gray-600">Loading product...</span>
+      </div>
 
-      <!-- Add to Cart Component -->
-      <AddToCart
-        :title="productName"
-        :price="19.00"
-        :stock="48"
-        :weight-options="weightOptions"
-        :id="productId"
-        :image="productImages[0]"
-        :slug="productSlug"
-      />
+      <!-- Error State -->
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <h3 class="text-lg font-semibold text-red-800 mb-2">Product Not Found</h3>
+        <p class="text-red-600">{{ error }}</p>
+      </div>
+
+      <!-- Product Components -->
+      <div v-else class="flex flex-row">
+        <!-- Product Preview Component -->
+        <ProductPreview
+          :images="productImages"
+          :alt-text="productName"
+        />
+
+        <!-- Add to Cart Component -->
+        <AddToCart
+          :title="productName"
+          :price="productPrice"
+          :stock="productStock"
+          :weight-options="weightOptions"
+          :id="productId"
+          :image="productImages[0]"
+          :slug="productSlug"
+        />
+      </div>
 
       
     </div>
@@ -29,43 +44,62 @@
 definePageMeta({
   auth: false
 })
+
 // Import components
 import ProductPreview from '~/components/ProductPreview.vue'
 import AddToCart from '~/components/ProductPage/AddToCart.vue'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+
+// Import product store
+import { useProductStore } from '~~/stores/products'
 
 // Route parameters
 const route = useRoute()
-const storeSlug = route.params['store-slug'] as string
-const productSlug = route.params['product-slug'] as string
+const storeSlug = route.params.storeSlug as string
+const productSlug = route.params.productSlug as string
 
-// Sample product data (in a real app, this would come from an API or database)
-const productName = `Dried Aonori Seaweed`
-const productId = `prod_${productSlug}_${Date.now()}` // Generate unique product ID
-const productImages = [
-  'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg', // Dried seaweed flakes
-  'https://images.pexels.com/photos/128402/pexels-photo-128402.jpeg',  // Seaweed in bowl
-  'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg'   // Natural seaweed texture
-]
+// Initialize product store
+const productStore = useProductStore()
 
-// Weight options for the AddToChart component
+// Computed properties for reactive data
+const currentProduct = computed(() => productStore.currentProduct)
+const productName = computed(() => currentProduct.value?.title || 'Product Not Found')
+const productId = computed(() => currentProduct.value?.id || `prod_${productSlug}`)
+const productImages = computed(() => currentProduct.value?.images || [])
+const productPrice = computed(() => currentProduct.value?.price || 0)
+const productStock = computed(() => currentProduct.value?.stock || 0)
+const isLoading = computed(() => productStore.loading)
+const error = computed(() => productStore.error)
+
+// Weight options for the AddToCart component (could also come from product data)
 const weightOptions = [
   { label: '100gm', value: '100gm' },
   { label: '200gm', value: '200gm' }
 ]
 
-// Scroll to top when component mounts
+// Fetch product data when component mounts
 onMounted(() => {
   window.scrollTo(0, 0)
+
+  // Get product by slug using the store getter
+  const product = productStore.getProductBySlug(productSlug)
+
+  if (product) {
+    // Product found in store, set it as current product
+    productStore.setCurrentProduct(product)
+  } else {
+    // Product not found, you could handle error here
+    console.warn(`Product with slug "${productSlug}" not found`)
+  }
 })
 
-// Page meta
+// Page meta (reactive)
 useHead({
-  title: `${productName} - ${storeSlug}`,
+  title: computed(() => `${productName.value} - ${storeSlug}`),
   meta: [
     {
       name: 'description',
-      content: `View details for ${productName} from ${storeSlug}`
+      content: computed(() => `View details for ${productName.value} from ${storeSlug}`)
     }
   ]
 })
