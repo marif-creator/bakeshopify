@@ -193,10 +193,12 @@ definePageMeta({
   auth: false
 })
 
-// Import cart store
+// Import stores
 import { useCartStore } from '../../stores/cart'
+import { useCheckoutStore } from '../../stores/checkout'
 
 const cartStore = useCartStore()
+const checkoutStore = useCheckoutStore()
 
 // Reactive state
 const promoCode = ref('')
@@ -223,10 +225,11 @@ const applyPromoCode = () => {
 }
 
 const proceedToCheckout = () => {
-  // Handle checkout logic
-  console.log('Proceeding to checkout...')
-  // Navigate to checkout page or open checkout modal
-  // navigateTo('/checkout')
+  // Initialize checkout from cart
+  checkoutStore.initializeFromCart()
+
+  // Navigate to checkout page
+  navigateTo('/checkout')
 }
 
 const continueShopping = () => {

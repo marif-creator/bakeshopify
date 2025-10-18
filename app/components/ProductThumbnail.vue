@@ -46,12 +46,12 @@
     <div class="space-y-2">
       <!-- Product Title -->
       <h3 class="font-medium text-sm line-clamp-2">
-        Samsung Galaxy Z Fold6
+        {{ props.product.title }}
       </h3>
 
       <!-- Price -->
       <div class="text-lg font-bold text-gray-900">
-        Rp19.999.000
+        {{ Number(props.product.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}
       </div>
 
       <!-- Rating and Sold Count -->

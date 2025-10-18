@@ -127,9 +127,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useCartStore } from '../../stores/cart'
+import { useCheckoutStore } from '../../stores/checkout'
 
-// Cart store
+// Cart stores
 const cartStore = useCartStore()
+const checkoutStore = useCheckoutStore()
 
 // Reactive state
 const isPreviewVisible = ref(false)
@@ -177,10 +179,10 @@ const viewCart = () => {
 
 
 const checkout = () => {
-  // Navigate to checkout page
+  // Initialize checkout from cart and navigate to checkout page
+  checkoutStore.initializeFromCart()
   isPreviewVisible.value = false
-  // You can add navigation logic here if you have a checkout page
-  // navigateTo('/checkout')
+  navigateTo('/checkout')
 }
 
 onUnmounted(() => {
