@@ -15,7 +15,7 @@
       </div>
 
       <!-- Main Image -->
-      <div class="product-preview__main">
+      <div id="mainproductimage" class="product-preview__main">
         <div class="product-preview__main-image">
           <img :src="currentImage" :alt="altText" />
         </div>

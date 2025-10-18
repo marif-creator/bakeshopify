@@ -7,7 +7,7 @@
       @mouseleave="hideCartPreview"
       @click="toggleCart"
     >
-      <Icon name="mdi:cart" size="20" class="text-gray-600" />
+      <Icon id="minicart" name="mdi:cart" size="20" class="text-gray-600" />
       <!-- Cart Counter Badge -->
       <span
         v-if="itemCount > 0"

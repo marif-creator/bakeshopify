@@ -136,33 +136,51 @@ const increaseQuantity = () => {
   }
 }
 
-// Import cart store at the top of the function
+// Import cart store and flying animation composable
 import { useCartStore } from '../../../stores/cart'
+import { useFlyingAnimation } from '../../../composables/useFlyingAnimation'
 
 const addToCart = () => {
-  // Use cart store to add item
-  const cartStore = useCartStore()
+  // Get the flying animation composable
+  const { animateToCart } = useFlyingAnimation()
 
-  cartStore.addItem({
-    id: props.id || 'default-id',
-    name: props.title || 'Product',
-    price: props.price || 0,
-    image: props.image || '',
-    slug: props.slug
-  })
+  // Trigger flying animation first
+  animateToCart()
 
-  // Reset quantity to 1 after adding to cart
-  quantity.value = 1
+  // Add item to cart store and trigger cart bounce only after animation completes
+  setTimeout(() => {
+    const cartStore = useCartStore()
 
-  console.log('Added to cart:', {
-    title: props.title,
-    price: props.price,
-    weight: selectedWeight.value,
-    quantity: quantity.value,
-    id: props.id,
-    image: props.image,
-    slug: props.slug
-  })
+    cartStore.addItem({
+      id: props.id || 'default-id',
+      name: props.title || 'Product',
+      price: props.price || 0,
+      image: props.image || '',
+      slug: props.slug
+    })
+
+    // Get cart element for bounce effect
+    const cartElement = document.getElementById('minicart')
+    if (cartElement) {
+      cartElement.style.transform = 'scale(1.2)'
+      setTimeout(() => {
+        cartElement.style.transform = 'scale(1)'
+      }, 200)
+    }
+
+    // Reset quantity to 1 after adding to cart
+    quantity.value = 1
+
+    console.log('Added to cart (animation complete):', {
+      title: props.title,
+      price: props.price,
+      weight: selectedWeight.value,
+      quantity: quantity.value,
+      id: props.id,
+      image: props.image,
+      slug: props.slug
+    })
+  }, 800) // Match animation duration - everything updates only after this
 }
 
 const buyNow = () => {
@@ -188,6 +206,7 @@ const handleShare = () => {
     navigator.clipboard.writeText(window.location.href)
   }
 }
+
 </script>
 
 <style scoped>
