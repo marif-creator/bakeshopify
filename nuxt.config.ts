@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['nuxt-vue3-google-signin','@nuxt/image', '@nuxt/ui'],
+  modules: ['nuxt-vue3-google-signin','@nuxt/image', '@nuxt/ui', '@pinia/nuxt'],
   vite: {
     plugins: [
       tailwindcss()
