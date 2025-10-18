@@ -11,7 +11,6 @@
       <Icon name="mdi:cart" size="20" class="text-gray-600" />
       <!-- Cart Counter Badge -->
       <span
-        v-if="itemCount > 0"
         class="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
       >
         {{ itemCount > 99 ? '99+' : itemCount }}
