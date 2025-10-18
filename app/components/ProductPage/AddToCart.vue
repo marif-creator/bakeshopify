@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+
 // Props
 interface Props {
   title?: string
@@ -98,6 +99,9 @@ interface Props {
   stock?: number
   weightOptions?: Array<{ label: string; value: string }>
   maxQuantity?: number
+  id?: string | number
+  image?: string
+  slug?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -132,13 +136,32 @@ const increaseQuantity = () => {
   }
 }
 
+// Import cart store at the top of the function
+import { useCartStore } from '../../../stores/cart'
+
 const addToCart = () => {
-  // Emit event or handle add to cart logic
+  // Use cart store to add item
+  const cartStore = useCartStore()
+
+  cartStore.addItem({
+    id: props.id || 'default-id',
+    name: props.title || 'Product',
+    price: props.price || 0,
+    image: props.image || '',
+    slug: props.slug
+  })
+
+  // Reset quantity to 1 after adding to cart
+  quantity.value = 1
+
   console.log('Added to cart:', {
     title: props.title,
     price: props.price,
     weight: selectedWeight.value,
-    quantity: quantity.value
+    quantity: quantity.value,
+    id: props.id,
+    image: props.image,
+    slug: props.slug
   })
 }
 

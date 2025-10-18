@@ -123,10 +123,5 @@ export const useCartStore = defineStore('cart', {
     closeCart() {
       this.isOpen = false
     }
-  },
-
-  // Persist cart data in localStorage
-  persist: {
-    storage: persistedState.localStorage,
-  },
+  }
 })

@@ -10,11 +10,14 @@
       />
 
       <!-- Add to Cart Component -->
-      <AddToChart
+      <AddToCart
         :title="productName"
         :price="19.00"
         :stock="48"
         :weight-options="weightOptions"
+        :id="productSlug"
+        :image="productImages[0]"
+        :slug="productSlug"
       />
 
       
@@ -28,7 +31,7 @@ definePageMeta({
 })
 // Import components
 import ProductPreview from '~/components/ProductPreview.vue'
-import AddToChart from '~/components/ProductPage/AddToChart.vue'
+import AddToCart from '~/components/ProductPage/AddToCart.vue'
 import { onMounted } from 'vue'
 
 // Route parameters
