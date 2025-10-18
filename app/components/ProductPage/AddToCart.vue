@@ -140,47 +140,44 @@ const increaseQuantity = () => {
 import { useCartStore } from '../../../stores/cart'
 import { useFlyingAnimation } from '../../../composables/useFlyingAnimation'
 
-const addToCart = () => {
+const addToCart = async () => {
   // Get the flying animation composable
   const { animateToCart } = useFlyingAnimation()
 
-  // Trigger flying animation first
-  animateToCart()
+  // Prepare cart item data
+  const cartItem = {
+    id: props.id || 'default-id',
+    name: props.title || 'Product',
+    price: props.price || 0,
+    image: props.image || '',
+    slug: props.slug
+  }
 
-  // Add item to cart store and trigger cart bounce only after animation completes
-  setTimeout(() => {
-    const cartStore = useCartStore()
+  try {
+    // Wait for flying animation to complete
+    const animationResult = await animateToCart('mainproductimage', 'minicart')
 
-    cartStore.addItem({
-      id: props.id || 'default-id',
-      name: props.title || 'Product',
-      price: props.price || 0,
-      image: props.image || '',
-      slug: props.slug
-    })
+    if (animationResult) {
+      // This runs when animation completes
+      const cartStore = useCartStore()
+      cartStore.addItem(cartItem)
 
-    // Get cart element for bounce effect
-    const cartElement = document.getElementById('minicart')
-    if (cartElement) {
-      cartElement.style.transform = 'scale(1.2)'
-      setTimeout(() => {
-        cartElement.style.transform = 'scale(1)'
-      }, 200)
+      // Reset quantity to 1 after adding to cart
+      quantity.value = 1
+
+      console.log('Added to cart (animation complete):', {
+        title: props.title,
+        price: props.price,
+        weight: selectedWeight.value,
+        quantity: quantity.value,
+        id: props.id,
+        image: props.image,
+        slug: props.slug
+      })
     }
-
-    // Reset quantity to 1 after adding to cart
-    quantity.value = 1
-
-    console.log('Added to cart (animation complete):', {
-      title: props.title,
-      price: props.price,
-      weight: selectedWeight.value,
-      quantity: quantity.value,
-      id: props.id,
-      image: props.image,
-      slug: props.slug
-    })
-  }, 800) // Match animation duration - everything updates only after this
+  } catch (error) {
+    console.error('Animation failed:', error)
+  }
 }
 
 const buyNow = () => {

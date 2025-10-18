@@ -20,122 +20,183 @@ interface FlyingAnimationOptions {
 
 export const useFlyingAnimation = () => {
   /**
-   * Animate an element flying from source to target
+   * Animate product image flying to cart with cart plug animation
+   * Returns a Promise that resolves when animation completes
    */
-  const animateToElement = (
-    sourceElementId: string,
-    targetElementId: string,
-    options: FlyingAnimationOptions = {}
-  ) => {
+  const animateProductToCart = async (
+    productImageElementId: string,
+    cartElementId: string,
+    options: Omit<FlyingAnimationOptions, 'onComplete' | 'onAnimationEnd'> & {
+      duration?: number
+      scale?: number
+      opacity?: number
+    } = {}
+  ): Promise<boolean> => {
     const {
       duration = 800,
       scale = 0.1,
-      opacity = 0.8,
-      onComplete,
-      onAnimationEnd
+      opacity = 0.8
     } = options
 
-    // Get the source element (element to clone)
-    const sourceElement = document.getElementById(sourceElementId)
-    if (!sourceElement) {
-      console.warn(`Source element with ID "${sourceElementId}" not found`)
-      return false
-    }
+    return new Promise((resolve) => {
+      // Get elements
+      const productElement = document.getElementById(productImageElementId)
+      const cartElement = document.getElementById(cartElementId)
 
-    // Get the target element (destination)
-    const targetElement = document.getElementById(targetElementId)
-    if (!targetElement) {
-      console.warn(`Target element with ID "${targetElementId}" not found`)
-      return false
-    }
-
-    // Find the image element within the source
-    const imgElement = sourceElement.querySelector('img')
-    if (!imgElement) {
-      console.warn(`No image element found within source element "${sourceElementId}"`)
-      return false
-    }
-
-    // Create a flying clone of the image
-    const flyingImage = imgElement.cloneNode(true) as HTMLImageElement
-    flyingImage.className = 'flying-animation'
-    flyingImage.style.pointerEvents = 'none'
-    flyingImage.style.zIndex = '9999'
-
-    // Get positions
-    const sourceRect = sourceElement.getBoundingClientRect()
-    const targetRect = targetElement.getBoundingClientRect()
-
-    // Set initial position (absolute positioning)
-    flyingImage.style.position = 'fixed'
-    flyingImage.style.left = `${sourceRect.left}px`
-    flyingImage.style.top = `${sourceRect.top}px`
-    flyingImage.style.width = `${sourceRect.width}px`
-    flyingImage.style.height = `${sourceRect.height}px`
-    flyingImage.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
-    flyingImage.style.borderRadius = '8px'
-    flyingImage.style.objectFit = 'cover'
-
-    // Append to body
-    document.body.appendChild(flyingImage)
-
-    // Force reflow to ensure initial styles are applied
-    flyingImage.offsetHeight
-
-    // Animate to target position (scaled down)
-    flyingImage.style.left = `${targetRect.left}px`
-    flyingImage.style.top = `${targetRect.top}px`
-    flyingImage.style.width = `${sourceRect.width * scale}px`
-    flyingImage.style.height = `${sourceRect.height * scale}px`
-    flyingImage.style.opacity = opacity.toString()
-
-    // Handle animation completion
-    const cleanup = () => {
-      if (flyingImage.parentNode) {
-        flyingImage.parentNode.removeChild(flyingImage)
+      if (!productElement) {
+        console.warn(`Product element with ID "${productImageElementId}" not found`)
+        resolve(false)
+        return
       }
-      onAnimationEnd?.()
-    }
 
-    // Set up completion callback
-    setTimeout(() => {
-      onComplete?.()
-      // Small delay before cleanup to ensure onComplete runs first
-      setTimeout(cleanup, 10)
-    }, duration)
+      if (!cartElement) {
+        console.warn(`Cart element with ID "${cartElementId}" not found`)
+        resolve(false)
+        return
+      }
 
-    return true
-  }
+      // Find the image element within the product
+      const imgElement = productElement.querySelector('img')
+      if (!imgElement) {
+        console.warn(`No image element found within product element "${productImageElementId}"`)
+        resolve(false)
+        return
+      }
 
-  /**
-   * Convenience method for product-to-cart animation
-   */
-  const animateToCart = (productImageElementId: string = 'mainproductimage', cartElementId: string = 'minicart') => {
-    return animateToElement(productImageElementId, cartElementId, {
-      duration: 800,
-      scale: 0.1,
-      opacity: 0.8
+      // Create flying product image
+      const flyingImage = imgElement.cloneNode(true) as HTMLImageElement
+      flyingImage.className = 'flying-product-animation'
+      flyingImage.style.pointerEvents = 'none'
+      flyingImage.style.zIndex = '9999'
+
+      // Get positions
+      const productRect = productElement.getBoundingClientRect()
+      const cartRect = cartElement.getBoundingClientRect()
+
+      // Set initial position for flying image
+      flyingImage.style.position = 'fixed'
+      flyingImage.style.left = `${productRect.left + productRect.width / 2}px`
+      flyingImage.style.top = `${productRect.top + productRect.height / 2}px`
+      flyingImage.style.width = `${productRect.width}px`
+      flyingImage.style.height = `${productRect.height}px`
+      flyingImage.style.transition = `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+      flyingImage.style.borderRadius = '8px'
+      flyingImage.style.objectFit = 'cover'
+
+      // Append flying image to body
+      document.body.appendChild(flyingImage)
+
+      // Force reflow
+      flyingImage.offsetHeight
+
+      // Animate flying image to cart
+      flyingImage.style.left = `${cartRect.left + cartRect.width / 2}px`
+      flyingImage.style.top = `${cartRect.top + cartRect.height / 2}px`
+      flyingImage.style.width = `${productRect.width * scale}px`
+      flyingImage.style.height = `${productRect.height * scale}px`
+      flyingImage.style.opacity = opacity.toString()
+
+      // Set up completion for flying animation
+      setTimeout(async () => {
+        // Trigger cart "plugged" animation when flying image arrives
+        triggerCartPlugAnimation(cartElement)
+
+        // Clean up flying image
+        if (flyingImage.parentNode) {
+          flyingImage.parentNode.removeChild(flyingImage)
+        }
+
+        // Resolve promise to indicate animation completion
+        resolve(true)
+      }, duration)
     })
   }
 
   /**
-   * Animate with callback for completion
+   * Animate cart with "plugged" effect
    */
-  const animateWithCallback = (
+  const triggerCartPlugAnimation = (cartElement: HTMLElement) => {
+    // Initial bounce
+    cartElement.style.transform = 'scale(1.3)'
+
+    // Pulsing effect
+    setTimeout(() => {
+      cartElement.style.transform = 'scale(1.1)'
+      cartElement.style.filter = 'brightness(1.2)'
+
+      setTimeout(() => {
+        cartElement.style.transform = 'scale(1)'
+        cartElement.style.filter = 'brightness(1)'
+
+        // Final settle
+        setTimeout(() => {
+          cartElement.style.transform = 'scale(0.95)'
+
+          setTimeout(() => {
+            cartElement.style.transform = 'scale(1)'
+          }, 100)
+        }, 150)
+      }, 200)
+    }, 100)
+  }
+
+  /**
+   * Convenience method for product-to-cart animation with async support
+   * Returns a Promise that resolves when animation completes
+   */
+  const animateToCart = async (
+    productImageElementId: string = 'mainproductimage',
+    cartElementId: string = 'minicart',
+    options: {
+      onCartUpdate?: () => void
+      duration?: number
+      scale?: number
+      opacity?: number
+    } = {}
+  ): Promise<boolean> => {
+    const { onCartUpdate, duration, scale, opacity } = options
+
+    // Start the flying animation
+    const animationResult = await animateProductToCart(productImageElementId, cartElementId, {
+      duration,
+      scale,
+      opacity
+    })
+
+    if (animationResult) {
+      // Trigger cart update and plug animation when flying completes
+      if (onCartUpdate) {
+        onCartUpdate()
+      } else {
+        // Default plug animation if no callback provided
+        const cartElement = document.getElementById(cartElementId)
+        if (cartElement) {
+          triggerCartPlugAnimation(cartElement)
+        }
+      }
+    }
+
+    return animationResult
+  }
+
+  /**
+   * Animate with async/await support
+   */
+  const animateWithPromise = async (
     sourceId: string,
     targetId: string,
-    onComplete?: () => void,
-    options?: Omit<FlyingAnimationOptions, 'onComplete'>
-  ) => {
-    return animateToElement(sourceId, targetId, {
-      ...options,
-      onComplete
-    })
+    options?: {
+      duration?: number
+      scale?: number
+      opacity?: number
+    }
+  ): Promise<boolean> => {
+    return animateProductToCart(sourceId, targetId, options)
   }
 
   return {
-    animateToElement,
+    animateProductToCart,
     animateToCart,
-    animateWithCallback
+    animateWithPromise
   }
 }

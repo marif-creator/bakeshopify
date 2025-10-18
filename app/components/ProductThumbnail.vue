@@ -1,37 +1,44 @@
 <template>
-  <NuxtLink :to="`/${props.storeSlug}/${props.productSlug}`">
-    <UCard class="w-48 hover:shadow-lg transition-shadow duration-200 cursor-pointer">
-    <!-- Discount Badge -->
-    <div class="absolute top-2 left-2 z-10">
-      <UBadge color="red" variant="solid" class="text-white font-bold">
-        {{ product.discount }}%
-      </UBadge>
-    </div>
+  <div class="relative">
+    <UCard class="w-48 hover:shadow-lg transition-shadow duration-200">
 
-    <!-- Samsung Official Store Badge -->
-    <div class="absolute top-2 right-2 z-10">
-      <div class="bg-white px-2 py-1 rounded text-xs font-medium text-gray-700 border">
-        Official Store
+    <!-- Badges and Product Image -->
+    <div class="relative -m-2">
+      <!-- Discount Badge -->
+      <div class="absolute -top-1 -left-1 z-10">
+        <UBadge color="error" variant="solid" class="text-white font-bold shadow-lg">
+          {{ product.discount }}%
+        </UBadge>
       </div>
-    </div>
 
-    <!-- Product Image -->
-    <div class="relative pt-8 pb-4">
-      <img
-        v-if="!imageLoading && productImage"
-        :src="productImage"
-        :alt="product.title"
-        class="w-full h-32 object-contain mx-auto transition-opacity duration-300"
-        @load="imageLoading = false"
-      />
-      <div
-        v-else
-        class="w-full h-32 flex items-center justify-center bg-gray-100 rounded"
-      >
-        <UIcon
-          name="i-heroicons-photo"
-          class="w-8 h-8 text-gray-400"
+      <!-- Official Store Badge -->
+      <div class="absolute -top-1 -right-1 z-10">
+        <div class="bg-white px-2 py-1 rounded text-xs font-medium text-gray-700 border shadow-sm">
+          Official Store
+        </div>
+      </div>
+
+      <!-- Product Image (Clickable for Navigation) -->
+      <div class="pt-8 pb-4"  :id="`product-image-${props.product.id}`">
+        <NuxtLink :to="`/${props.storeSlug}/${props.productSlug}`">
+        <img
+         
+          v-if="!imageLoading && productImage"
+          :src="productImage"
+          :alt="product.title"
+          class="w-full h-32 object-contain mx-auto transition-opacity duration-300 hover:opacity-80 cursor-pointer"
+          @load="imageLoading = false"
         />
+        <div
+          v-else
+          class="w-full h-32 flex items-center justify-center bg-gray-100 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+        >
+          <UIcon
+            name="i-heroicons-photo"
+            class="w-8 h-8 text-gray-400"
+          />
+        </div>
+      </NuxtLink>
       </div>
     </div>
 
@@ -62,24 +69,26 @@
         <span class="text-xs text-gray-600">Samsung Official Store</span>
       </div>
 
-      <!-- Feature Icons -->
-      <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-        <div class="flex items-center space-x-1">
-          <UIcon name="i-heroicons-pencil" class="w-3 h-3 text-gray-400" />
-          <span class="text-xs text-gray-500">Note Assist</span>
-        </div>
-        <div class="flex items-center space-x-1">
-          <UIcon name="i-heroicons-camera" class="w-3 h-3 text-gray-400" />
-          <span class="text-xs text-gray-500">Photo Assist</span>
-        </div>
-        <div class="flex items-center space-x-1">
-          <UIcon name="i-heroicons-language" class="w-3 h-3 text-gray-400" />
-          <span class="text-xs text-gray-500">Smart Select</span>
-        </div>
+
+      <!-- Add to Cart Button -->
+      <div class="flex justify-center pt-3">
+        <button
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center space-x-2 w-full max-w-[140px]"
+          @click.stop="addToCart"
+          :disabled="isAddingToCart"
+        >
+          <Icon
+            name="mdi:cart-plus"
+            size="16"
+            class="transition-transform duration-200"
+            :class="{ 'scale-110': isAddingToCart }"
+          />
+          <span class="text-sm">Add to Cart</span>
+        </button>
       </div>
     </div>
     </UCard>
-  </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -123,6 +132,11 @@ const props = withDefaults(defineProps<{
 // Reactive state for image handling
 const productImage = ref<string>('')
 const imageLoading = ref<boolean>(true)
+const isAddingToCart = ref<boolean>(false)
+
+// Import cart store and flying animation composable
+import { useCartStore } from '../../stores/cart'
+import { useFlyingAnimation } from '../../composables/useFlyingAnimation'
 
 // Pexels API response interfaces
 interface PexelsPhoto {
@@ -194,6 +208,40 @@ const formatPrice = (price: number) => {
 onMounted(() => {
   fetchProductImage(props.product.title)
 })
+
+// Add to cart functionality with flying animation
+const addToCart = async () => {
+  const { animateToCart } = useFlyingAnimation()
+
+  // Set loading state
+  isAddingToCart.value = true
+
+  // Prepare cart item data
+  const cartItem = {
+    id: props.product.id,
+    name: props.product.title,
+    price: props.product.price,
+    image: productImage.value,
+    slug: props.productSlug
+  }
+
+  try {
+    // Wait for flying animation to complete
+    const animationResult = await animateToCart(`product-image-${props.product.id}`, 'minicart')
+
+    if (animationResult) {
+      // Add item to cart when animation completes
+      const cartStore = useCartStore()
+      cartStore.addItem(cartItem)
+    }
+
+    // Reset loading state after animation
+    isAddingToCart.value = false
+  } catch (error) {
+    console.error('Animation failed:', error)
+    isAddingToCart.value = false
+  }
+}
 </script>
 
 <style scoped>
