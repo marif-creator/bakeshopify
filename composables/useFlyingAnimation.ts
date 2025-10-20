@@ -90,7 +90,7 @@ export const useFlyingAnimation = () => {
       flyingImage.offsetHeight
 
       // Animate flying image to cart
-      flyingImage.style.left = `${cartRect.left}px`
+      flyingImage.style.left = `${cartRect.left + cartRect.width / 2}px`
       flyingImage.style.top = `${cartRect.top}px`
       flyingImage.style.width = `${productRect.width * scale}px`
       flyingImage.style.height = `${productRect.height * scale}px`
