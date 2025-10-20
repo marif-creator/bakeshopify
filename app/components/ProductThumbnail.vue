@@ -55,7 +55,7 @@
           <!-- Verified Badge -->
           <div class="flex items-center space-x-1">
             <UIcon name="i-heroicons-check-badge" class="w-4 h-4 text-blue-500" />
-            <span class="text-xs text-gray-600">Samsung Official Store</span>
+            <span class="text-xs text-gray-600">Bakeshopify Store</span>
           </div>
 
 
