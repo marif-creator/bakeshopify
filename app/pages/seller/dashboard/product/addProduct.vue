@@ -78,7 +78,7 @@ const product = computed(() => {
 
 // Methods
 const goBack = () => {
-  router.push('/seller/dashboard?tab=products')
+  router.push('/seller/dashboard/product')
 }
 
 const previewProduct = () => {
